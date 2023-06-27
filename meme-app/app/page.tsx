@@ -1,6 +1,6 @@
-"use client";
-import useLLM from "usellm";
+"use client"
 import React, { useState, useEffect } from "react";
+import useLLM from "usellm";
 
 export default function ImageGeneration() {
   const [prompt, setPrompt] = useState("");
@@ -8,17 +8,16 @@ export default function ImageGeneration() {
   const [loadingMemeCaptions, setLoadingMemeCaptions] = useState(false);
   const [image, setImage] = useState("");
   const [status, setStatus] = useState("");
-  const [meme, setMeme] = useState("");
 
   const llm = useLLM({
-    serviceUrl: "https://usellm.org/api/llm", // For testing only. Follow this guide to create your own service URL: https://usellm.org/docs/api-reference/create-llm-service
+    serviceUrl: "https://usellm.org/api/llm",
   });
 
   const SYSTEM_PROMPT = `You are an AI Meme Bot, designed to generate funny memes. Given a topic of 
   
   ${prompt}
 
-  you will provide a single meme idea and a corresponding image description.
+  you will provide a sarcastic single meme idea and a corresponding image description.
   For example:
   
   Meme Idea: 'When you have a high bias in your model and your boss says, 'Just add more features!''
@@ -45,9 +44,12 @@ export default function ImageGeneration() {
 
       console.log("Received message: ", message.content);
       setCaption(message.content);
-      handleGenerateClick(caption.split("Image:")[0].trim()); // Call handleGenerateClick with the initial caption
+      // console.log(caption.substring(caption.indexOf("Image:") + 6).trim());
+      handleGenerateClick(caption.substring(caption.indexOf("Image:") + 6).trim()); // Call handleGenerateClick with the initial caption
     } catch (error) {
       console.error("Something went wrong!", error);
+    } finally {
+      setLoadingMemeCaptions(false);
     }
   }
 
@@ -56,16 +58,16 @@ export default function ImageGeneration() {
       setStatus("Generating...");
       setImage("");
 
-      // const { message } = await llm.chat({
-      //   messages: [
-      //     {
-      //       role: "user",
-      //       content: extractedcaption,
-      //     },
-      //   ],
-      // });
-
-      // console.log("Received message: ", message.content);
+      // / const { message } = await llm.chat({
+        //   messages: [
+        //     {
+        //       role: "user",
+        //       content: extractedcaption,
+        //     },
+        //   ],
+        // });
+  
+        // console.log("Received message: ", message.content);
 
       const { images } = await llm.generateImage({ prompt: ImageDescription });
       setImage(images[0]);
@@ -77,7 +79,7 @@ export default function ImageGeneration() {
 
   useEffect(() => {
     if (caption) {
-      handleGenerateClick(caption); // Call handleGenerateClick when the caption state changes
+      handleGenerateClick(caption.split("Image:")[0].trim().slice(11,));
     }
   }, [caption]);
 
@@ -93,21 +95,22 @@ export default function ImageGeneration() {
           onChange={(e) => setPrompt(e.target.value)}
         />
         <button
-          className="p-2 border rounded bg-gray-100 hover:bg-gray-200 active:bg-gray-300 dark:bg-white dark:text-black font-medium ml-2 "
+          className="p-2 border rounded bg-gray-100 hover:bg-gray-200 active:bg-gray-300 dark:bg-white dark:text-black font-medium ml-2"
           onClick={handleClickGenerateMemeCaption}
+          disabled={loadingMemeCaptions}
         >
-          Generate
+          {loadingMemeCaptions ? "Generating..." : "Generate"}
         </button>
       </div>
 
-      {loadingMemeCaptions && <div></div>}
+      {loadingMemeCaptions && <div>Loading meme captions...</div>}
 
       {caption && (
         <div>
           {/* <h3 className="font-semibold">Meme Caption:</h3> */}
           {/* <p>{caption}</p> */}
           <p>{caption.substring(0, caption.indexOf("Image:")).trim().slice(11,)}</p>
-      {/* {meme && (
+        {/* {meme && (
         <div>
           <h3 className="font-semibold">Meme Caption:</h3>
           <p>{meme}</p> */}
@@ -118,7 +121,10 @@ export default function ImageGeneration() {
             Generate Image
           </button>
         </div>
-      )} */}
+      )} */
+      }
+      </div>
+      )}
 
       {status && <div>{status}</div>}
 
@@ -132,6 +138,5 @@ export default function ImageGeneration() {
         />
       )}
     </div>
-  )}
-</div>
-)};
+  );
+}
