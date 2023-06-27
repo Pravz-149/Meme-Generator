@@ -108,8 +108,8 @@ export default function ImageGeneration() {
       {caption && (
         <div>
           {/* <h3 className="font-semibold">Meme Caption:</h3> */}
-          {/* <p>{caption}</p> */}
-          <p>{caption.substring(0, caption.indexOf("Image:")).trim().slice(11,)}</p>
+          <p>{caption.substring(0,caption.indexOf("Image:")).slice(11,)}</p>
+          {/* <p>{caption.substring(0, caption.indexOf("Image:")).trim().slice(11,)}</p> */}
         {/* {meme && (
         <div>
           <h3 className="font-semibold">Meme Caption:</h3>
